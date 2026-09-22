@@ -380,6 +380,18 @@ function setDriveStatus(state, text){
   const led = document.getElementById('driveLed');
   led.className = 'status-led' + (state ? ' ' + state : '');
   document.getElementById('driveStatusText').textContent = text;
+
+  // Keep the sidebar footer's storage line in sync with the real connection state
+  const modeEl = document.getElementById('storageMode');
+  if(state === 'syncing'){
+    modeEl.textContent = accessToken ? 'Syncing with Google Drive…' : 'Reconnecting to Google Drive…';
+  } else if(!accessToken){
+    modeEl.textContent = 'Stored locally on this device';
+  } else if(state === 'error'){
+    modeEl.textContent = 'Drive sync error — saved locally for now';
+  } else {
+    modeEl.textContent = 'Synced with Google Drive';
+  }
 }
 
 function gisLoaded(){
@@ -422,7 +434,6 @@ function onTokenResponse(resp){
   document.getElementById('driveBtnLabel').textContent = 'Connected';
   document.getElementById('driveConnectBtn').style.display = 'none';
   document.getElementById('driveSignOutBtn').style.display = 'block';
-  document.getElementById('storageMode').textContent = 'Synced with Google Drive';
   setDriveStatus('syncing', 'Syncing…');
   syncFromDrive();
 }
@@ -546,7 +557,6 @@ document.getElementById('driveSignOutBtn').addEventListener('click', () => {
   document.getElementById('driveBtnLabel').textContent = 'Sign in with Google';
   document.getElementById('driveConnectBtn').style.display = 'flex';
   document.getElementById('driveSignOutBtn').style.display = 'none';
-  document.getElementById('storageMode').textContent = 'Stored locally on this device';
   setDriveStatus('', 'Not connected');
 });
 
